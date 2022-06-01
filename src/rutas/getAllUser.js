@@ -1,14 +1,8 @@
-const getAllUser = async (req, res) => {
+const selectAllUser = require('../consultas/selectAllUser');
+
+const getAllUser = async (req, res, client) => {
     try {
-        const users = [{
-            id: 1,
-            username: 'juan',
-            email: 'j@mail.cl',
-        }, {
-            id: 2,
-            username: 'pedrito',
-            email: 'pedrito@mail.cl',
-        }];
+        const users = await selectAllUser(client);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(users));
     } catch (error) {

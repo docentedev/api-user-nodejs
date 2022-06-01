@@ -1,12 +1,21 @@
-const getUserByName = async (req, res) => {
+const url = require('url');
+const selectUserByName = require('../consultas/selectUserByName');
+
+const getUserByName = async (req, res, client) => {
     try {
-        const user = {
-            id: 1,
-            username: 'juan',
-            email: 'j@mail.cl',
-        };
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(user));
+        const query = url.parse(req.url, true).query;
+        const name = query.name || '';
+        const user = await selectUserByName(name, client);
+        if (user) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(user));
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                message: `User (${name}) Not Found`
+            }));
+        }
+
     } catch (error) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
