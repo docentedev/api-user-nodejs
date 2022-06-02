@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/docentedev/api-user-nodejs#readme",
   "dependencies": {
+    "dotenv": "^16.0.1",
     "pg": "^8.7.3"
   }
 }

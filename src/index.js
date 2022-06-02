@@ -1,26 +1,36 @@
-const http = require('http');
+require('dotenv').config()
 const getAllUser = require('./rutas/getAllUser');
 const getUserByName = require('./rutas/getUserByName');
-const conexion = require('./conexion');
+const conexion = require('./server/conexion');
+const server = require('./server')
 
-const main = async () => {
+const dbSettings = {
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+}
+
+const program = async () => {
     try {
-        const client = await conexion();
-        const server = http.createServer((req, res) => {
-            if (req.method === 'GET' && req.url === '/users') {
-                getAllUser(req, res, client);
+        const client = await conexion(dbSettings);
+        const servicios = {
+            '/users': {
+                method: 'GET',
+                callback: getAllUser,
+                isStartsWith: false,
+            },
+            '/users?': {
+                method: 'GET',
+                callback: getUserByName,
+                isStartsWith: true,
             }
-            if (req.method === 'GET' && req.url.startsWith('/users?')) {
-                getUserByName(req, res, client);
-            }
-        })
-
-        server.listen(3000, () => {
-            console.log('Server running at http://localhost:3000/');
-        });
+        }
+        server(process.env.PORT, servicios, client)
     } catch (error) {
         console.log(error);
     }
 }
 
-main()
+program()
